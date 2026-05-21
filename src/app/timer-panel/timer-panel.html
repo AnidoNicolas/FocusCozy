@@ -1,0 +1,142 @@
+<article class="timer-panel" aria-label="Pomodoro configurable">
+  <header class="panel-heading">
+    <div>
+      <p class="eyebrow">Productividad personal</p>
+      <h1>Panel de foco</h1>
+    </div>
+    <div class="daily-score" aria-label="Resumen rapido">
+      <div>
+        <span>{{ completedPomodoros() }}</span>
+        <small>pomodoros</small>
+      </div>
+      <div>
+        <span>{{ activeTasks() }}</span>
+        <small>pendientes</small>
+      </div>
+    </div>
+  </header>
+
+  <section class="clock-zone" aria-label="Reloj pomodoro">
+    <div class="mode-tabs" aria-label="Modo del temporizador">
+      <button type="button" [class.active]="mode() === 'focus'" (click)="modeSelected.emit('focus')">
+        Enfoque
+      </button>
+      <button
+        type="button"
+        [class.active]="mode() === 'shortBreak'"
+        (click)="modeSelected.emit('shortBreak')"
+      >
+        Corta
+      </button>
+      <button
+        type="button"
+        [class.active]="mode() === 'longBreak'"
+        (click)="modeSelected.emit('longBreak')"
+      >
+        Larga
+      </button>
+    </div>
+
+    <div class="timer-face">
+      <div class="progress-ring" [style.--progress]="progress() + '%'" aria-hidden="true">
+        <div class="timer-core">
+          <p>{{ modeLabel() }}</p>
+          <strong>{{ formattedTime() }}</strong>
+          <span>{{ isRunning() ? 'En marcha' : 'Listo' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="timer-actions">
+      <button type="button" class="primary-action" (click)="timerToggled.emit()">
+        {{ isRunning() ? 'Pausar' : 'Iniciar' }}
+      </button>
+      <button type="button" class="secondary-action" (click)="timerReset.emit()">Reset</button>
+      <button
+        type="button"
+        class="sound-action"
+        [class.muted]="!soundEnabled()"
+        (click)="soundToggled.emit()"
+      >
+        {{ soundEnabled() ? 'Sonido' : 'Silencio' }}
+      </button>
+      <button
+        type="button"
+        class="config-action"
+        [class.active]="settingsVisible()"
+        (click)="toggleSettings()"
+      >
+        Config
+      </button>
+    </div>
+  </section>
+
+  @if (settingsVisible()) {
+    <section class="lower-controls" aria-label="Configuracion y resumen">
+      <section class="settings-panel" aria-label="Configuracion del pomodoro">
+        <h2>Configurar tiempos</h2>
+        <div class="setting-grid">
+          <label>
+            <span>Enfoque</span>
+            <input
+              type="number"
+              min="1"
+              max="90"
+              [ngModel]="settings().focus"
+              (ngModelChange)="settingUpdated.emit({ key: 'focus', value: $event })"
+            />
+            <small>min</small>
+          </label>
+          <label>
+            <span>Corta</span>
+            <input
+              type="number"
+              min="1"
+              max="30"
+              [ngModel]="settings().shortBreak"
+              (ngModelChange)="settingUpdated.emit({ key: 'shortBreak', value: $event })"
+            />
+            <small>min</small>
+          </label>
+          <label>
+            <span>Larga</span>
+            <input
+              type="number"
+              min="1"
+              max="60"
+              [ngModel]="settings().longBreak"
+              (ngModelChange)="settingUpdated.emit({ key: 'longBreak', value: $event })"
+            />
+            <small>min</small>
+          </label>
+          <label>
+            <span>Ciclo</span>
+            <input
+              type="number"
+              min="2"
+              max="8"
+              [ngModel]="settings().sessionsBeforeLongBreak"
+              (ngModelChange)="settingUpdated.emit({ key: 'sessionsBeforeLongBreak', value: $event })"
+            />
+            <small>focos</small>
+          </label>
+        </div>
+      </section>
+
+      <aside class="stats-panel" aria-label="Resumen de productividad">
+        <div class="stat-row">
+          <span>Pendientes</span>
+          <strong>{{ activeTasks() }}</strong>
+        </div>
+        <div class="stat-row">
+          <span>Completadas</span>
+          <strong>{{ completedTasks() }}</strong>
+        </div>
+        <div class="stat-row">
+          <span>Ronda</span>
+          <strong>{{ modeLabel() }}</strong>
+        </div>
+      </aside>
+    </section>
+  }
+</article>

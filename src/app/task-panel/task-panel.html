@@ -1,0 +1,99 @@
+<article class="task-panel" aria-label="Gestion de tareas">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Lista activa</p>
+      <h2>{{ taskView() === 'pending' ? 'Tareas de hoy' : 'Completadas por semana' }}</h2>
+    </div>
+    <div class="task-actions">
+      <button
+        type="button"
+        class="ghost-action"
+        [class.active]="taskView() === 'pending'"
+        (click)="selectTaskView('pending')"
+      >
+        Pendientes
+      </button>
+      <button
+        type="button"
+        class="ghost-action"
+        [class.active]="taskView() === 'weeklyCompleted'"
+        (click)="selectTaskView('weeklyCompleted')"
+      >
+        Semanas
+      </button>
+      <button type="button" class="ghost-action" (click)="completedCleared.emit()">Limpiar</button>
+    </div>
+  </div>
+
+  @if (taskView() === 'pending') {
+    <form class="task-form" (ngSubmit)="addTask()">
+      <input
+        type="text"
+        name="task"
+        placeholder="Agregar una tarea concreta"
+        [ngModel]="taskTitle()"
+        (ngModelChange)="taskTitle.set($event)"
+      />
+      <button type="submit">Agregar</button>
+    </form>
+
+    <ul class="task-list">
+      @for (task of pendingTasks(); track task.id) {
+        <li>
+          <button
+            type="button"
+            class="check-button"
+            [attr.aria-pressed]="task.completed"
+            (click)="taskToggled.emit(task.id)"
+          >
+            <span></span>
+          </button>
+          <p>{{ task.title }}</p>
+          <button
+            type="button"
+            class="remove-button"
+            (click)="taskRemoved.emit(task.id)"
+            aria-label="Quitar tarea"
+          >
+            Quitar
+          </button>
+        </li>
+      } @empty {
+        <li class="empty-state">No hay tareas pendientes.</li>
+      }
+    </ul>
+  } @else {
+    <section class="weekly-view" aria-label="Tareas completadas por semana">
+      @for (week of completedWeeks(); track week.label) {
+        <article class="week-group">
+          <h3>{{ week.label }}</h3>
+          <ul class="task-list completed-history">
+            @for (task of week.tasks; track task.id) {
+              <li class="completed">
+                <button
+                  type="button"
+                  class="check-button"
+                  [attr.aria-pressed]="task.completed"
+                  (click)="taskToggled.emit(task.id)"
+                >
+                  <span></span>
+                </button>
+                <p>{{ task.title }}</p>
+                <button
+                  type="button"
+                  class="remove-button"
+                  (click)="taskRemoved.emit(task.id)"
+                  aria-label="Quitar tarea"
+                >
+                  Quitar
+                </button>
+              </li>
+            }
+          </ul>
+        </article>
+      } @empty {
+        <div class="weekly-empty">Todavia no hay tareas completadas.</div>
+      }
+    </section>
+  }
+</article>

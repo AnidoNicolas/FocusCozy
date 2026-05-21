@@ -1,0 +1,29 @@
+<main class="productivity-shell">
+  <section class="workspace">
+    <section class="dashboard-grid" aria-label="Panel de productividad">
+      <app-timer-panel
+        [settings]="settings()"
+        [mode]="mode()"
+        [secondsLeft]="secondsLeft()"
+        [isRunning]="isRunning()"
+        [soundEnabled]="soundEnabled()"
+        [completedPomodoros]="completedPomodoros()"
+        [activeTasks]="activeTasks()"
+        [completedTasks]="completedTasks()"
+        (modeSelected)="selectMode($event)"
+        (timerToggled)="toggleTimer()"
+        (timerReset)="resetTimer()"
+        (soundToggled)="toggleSound()"
+        (settingUpdated)="updateSetting($event.key, $event.value)"
+      />
+
+      <app-task-panel
+        [tasks]="tasks()"
+        (taskAdded)="addTask($event)"
+        (taskToggled)="toggleTask($event)"
+        (taskRemoved)="removeTask($event)"
+        (completedCleared)="clearCompleted()"
+      />
+    </section>
+  </section>
+</main>
